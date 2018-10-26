@@ -1,13 +1,63 @@
 <template>
   <div>
+
     <h1>测试Demo</h1>
+
+    <button @click="testMin_m">点击调用mixin methods testMixin</button>
+
+    <hr >
+
+    <input type="text" v-autoFocus>
+
+    <hr >
+
+    <testRender :list="forTest"></testRender>
+
+    <hr >
+
+    <button v-stat="{type:'i am type',fun:'i am fun'}">点击调用埋点directive stat</button>
 
   </div>
 </template>
 
 <script>
+  import {test,test1} from '../other/exports'
+  import testd from '../other/exportDefault'
+
+  import mixint from '../mixins/testM0'
+
+  import autoFocus from '../directives/autoFocus'
+  import stat from '../directives/stat'
+
   export default {
     name: "demo",
+    mixins:[ mixint ],
+    directives:{autoFocus,stat},
+    components:{
+      testRender: {
+        props: ['list'],
+        render(h) {
+          let _this=this;
+          return h('div',{
+            'class': {
+              foo: true,
+              bar: false
+            },
+            style: {
+              border:'1px solid red',
+              textAlign:'left'
+            },
+            attrs: {
+              id: 'foo'
+            }
+          },[
+            h('ul',_this.list.map((v)=>{
+              return h('li',`${v.name} ${v.age}`)
+            }))
+          ])
+        }
+      }
+    },
     data() {
       return {
         forTest:[
@@ -147,6 +197,7 @@
           console.log(1);
 
           console.log('-----javascript宏任务和微任务 end-----');
+          console.log('-----end-----');
         })
 
         new Promise(function(resolve,reject){
@@ -158,11 +209,120 @@
 
         console.log(0);
 
-        console.log('-----end-----');
+        //- 上面存在异步，下面实例延时1ms
+        setTimeout(()=>{
 
+          console.log('-----实例6 let和const-----')
 
+          var a = [];
+          for (var i = 0; i < 10; i++) {
+            a[i] = function () {
+              console.log(i);
+            }
+          }
+          a[6](); // 10
 
-      }
+          for (let i = 0; i < 10; i++) {
+            a[i] = function () {
+              console.log(i);
+            }
+          }
+          a[6](); // 6
+
+          console.log('-----end-----')
+
+          console.log('-----实例7 (){}和（)=>{ }）-----')
+
+          let testObj={
+            test(){
+              console.log('(){}');
+            }
+          }
+
+          let testFun=()=>{
+            return '()=>{}';
+          }
+
+          testObj.test()
+          console.log(testFun());
+
+          console.log('vue单文件的data、methods、mounted简写');
+
+          console.log('-----end-----')
+
+          console.log('-----实例8 export和export default-----')
+
+          console.log(test);
+          console.log(test1);
+          console.log(testd);
+
+          console.log('-----end-----')
+
+          console.log('-----实例9 find、findIndex、includes-----')
+
+          let testArr_f = [
+            'marry',
+            'john',
+            'xiaoming',
+            'xiaoqi',
+          ]
+
+          console.log(testArr_f.indexOf('xiaoming'));
+          console.log(testArr_f.includes('xiaoming'));
+
+          let filter_v=testArr_f.filter((v)=>{
+            console.log(v);
+            return v=='john'
+          })
+
+          console.log('--')
+          console.log(filter_v);
+          console.log('----')
+
+          let filter_f=testArr_f.find((v)=>{
+            console.log(v);
+            return v=='john'
+          })
+
+          console.log('--')
+          console.log(filter_f);
+          console.log('----')
+
+          let filter_s=testArr_f.some((v)=>{
+            console.log(v);
+            return v=='john'
+          })
+          console.log('--')
+          console.log(filter_s);
+
+          console.log('-----end-----')
+
+          console.log('-----实例10 async await-----')
+
+          _this.testAsync()
+
+        },1)
+
+      },
+      async testAsync(){
+        await new Promise((resolve,reject)=>{
+          setTimeout(()=>{
+            resolve();
+          },500)
+        })
+        console.log('i am async 1s')
+        await new Promise((resolve,reject)=>{
+          setTimeout(()=>{
+            resolve();
+          },500)
+        })
+        console.log('i am async 2s')
+        console.log('-----end-----')
+      },
+      testMin_m(){
+        this.testMixin();
+      },
+
     },
     mounted(){
       this.init()
