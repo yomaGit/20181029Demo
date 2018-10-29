@@ -11,11 +11,24 @@
 
     <hr >
 
-    <testRender :list="forTest"></testRender>
+    <testRender :list="forTest" v-model="inputValue" :changeage="changeAge"></testRender>
+
+    <div style="text-align:left;">
+      <input type="text" v-model="inputValue">
+      <ul>
+        <li v-for="item in forTest">{{item.name}} {{item.age}}</li>
+      </ul>
+    </div>
 
     <hr >
 
     <button v-stat="{type:'i am type',fun:'i am fun'}">点击调用埋点directive stat</button>
+
+    <hr >
+
+    <button @click="test_error()">点击触发报错（非异步方法）</button>
+    <button @click="testAsync_error()">点击触发报错（异步方法）</button>
+    <button @click="testAsync_error_async()">点击触发报错（异步方法_async）</button>
 
   </div>
 </template>
@@ -35,7 +48,7 @@
     directives:{autoFocus,stat},
     components:{
       testRender: {
-        props: ['list'],
+        props: ['list','value','changeage'],
         render(h) {
           let _this=this;
           return h('div',{
@@ -51,15 +64,33 @@
               id: 'foo'
             }
           },[
+            h('input',{
+              domProps:{
+                value:_this.value
+              },
+              on:{
+                input:function (e){
+                  _this.$emit('input',e.target.value)
+                }
+              }
+            }),
             h('ul',_this.list.map((v)=>{
               return h('li',`${v.name} ${v.age}`)
-            }))
+            })),
+            h('button',{
+              on:{
+                click:()=>{
+                  _this.changeage()
+                }
+              }
+            },'改变列表数据')
           ])
         }
       }
     },
     data() {
       return {
+        inputValue:'123',
         forTest:[
           {
             name:'john',
@@ -301,6 +332,22 @@
 
           _this.testAsync()
 
+          console.log('-----实例10 async await-----')
+
+          let testArr_set=[1,2,3,4,4,5]
+          let testArr_set_n=[...new Set(testArr_set)]
+          console.log(`原数组：${JSON.stringify(testArr_set)}`)
+          console.log(`new set数组：${JSON.stringify(testArr_set_n)}`)
+
+          console.log('----');
+
+          let testArr_set0=[1,2,3,{a:3},{a:3}];
+          let testArr_set0_n=[...new Set(testArr_set0)];
+          console.log(`原数组：${JSON.stringify(testArr_set0)}`);
+          console.log(`new set数组：${JSON.stringify(testArr_set0_n)}`);
+
+          console.log('-----end-----')
+
         },1)
 
       },
@@ -319,9 +366,48 @@
         console.log('i am async 2s')
         console.log('-----end-----')
       },
+      test_error(){//- 正常流程报错监听方法
+        let a=undefined;
+        let b=a.length;
+      },
+      testAsync_error(){//- 异步报错监听方法
+        new Promise((resolve,reject)=>{
+          setTimeout(()=>{
+            resolve();
+          },500)
+        }).then(()=>{
+          let a=undefined;
+          let b=a.length;
+        }).catch((e)=>{
+          console.log(`%c监控到了 promise error`,'color:blue');
+          console.log(e);
+        })
+
+      },
+      testAsync_error_async(){//- 方法调async
+
+        this.test_async().catch((e)=>{
+          console.log(`%c监控到了 async error`,'color:blue');
+          console.log(e);
+        })
+      },
+      async test_async(){
+        await new Promise((resolve,reject)=>{
+          setTimeout(()=>{
+            resolve();
+          },500)
+        })
+
+        let a=undefined;
+        let b=a.length;
+      },
       testMin_m(){
         this.testMixin();
       },
+      changeAge(){
+        let _this=this;
+        _this.forTest[2].age=20;
+      }
 
     },
     mounted(){
