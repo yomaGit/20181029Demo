@@ -341,7 +341,8 @@
 
           console.log('----');
 
-          let testArr_set0=[1,2,3,{a:3},{a:3}];
+
+          let testArr_set0=[1,2,3,3,{a:3},{a:3}];
           let testArr_set0_n=[...new Set(testArr_set0)];
           console.log(`原数组：${JSON.stringify(testArr_set0)}`);
           console.log(`new set数组：${JSON.stringify(testArr_set0_n)}`);
