@@ -4,6 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
+import { toast } from 'pubtest_wp'
+Vue.use(toast);
+
 Vue.config.productionTip = false
 
 window.onerror=function (e) {

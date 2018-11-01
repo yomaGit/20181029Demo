@@ -30,6 +30,10 @@
     <button @click="testAsync_error()">点击触发报错（异步方法）</button>
     <button @click="testAsync_error_async()">点击触发报错（异步方法_async）</button>
 
+    <toast></toast>
+
+    <button @click="testToast">测试toast</button>
+
   </div>
 </template>
 
@@ -385,22 +389,26 @@
         })
 
       },
-      testAsync_error_async(){//- 方法调async
+      async testAsync_error_async(){//- 方法调async
 
         this.test_async().catch((e)=>{
           console.log(`%c监控到了 async error`,'color:blue');
           console.log(e);
         })
+
       },
-      async test_async(){
-        await new Promise((resolve,reject)=>{
+      test_async(){
+        return new Promise((resolve,reject)=>{
           setTimeout(()=>{
             resolve();
           },500)
+        }).then(()=>{
+          let a=undefined;
+          let b=a.length;
         })
-
-        let a=undefined;
-        let b=a.length;
+        //
+        // let a=undefined;
+        // let b=a.length;
       },
       testMin_m(){
         this.testMixin();
@@ -408,6 +416,9 @@
       changeAge(){
         let _this=this;
         _this.forTest[2].age=20;
+      },
+      testToast(){
+        this.$toast('12121');
       }
 
     },
